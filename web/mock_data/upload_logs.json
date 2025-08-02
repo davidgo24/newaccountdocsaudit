@@ -1,0 +1,14 @@
+[
+  {
+    "member_id": "100001",
+    "uploaded_docs": ["Identification"]
+  },
+  {
+    "member_id": "100002",
+    "uploaded_docs": ["Identification", "Membership App", "Membership Agreement"]
+  },
+  {
+    "member_id": "100003",
+    "uploaded_docs": ["Membership App"]
+  }
+]

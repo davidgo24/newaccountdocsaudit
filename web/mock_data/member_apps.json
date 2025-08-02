@@ -1,0 +1,32 @@
+[
+  {
+    "member_id": "100001",
+    "member_name": "John Random",
+    "application_number": 112454,
+    "member_email": "johnrandom@example.com",
+    "employee_email": "david.godinez@cu.com",
+    "manager_email": "manager.altadena@creditunion.com",
+    "opened_date": "2025-08-01T10:30:00",
+    "required_docs": ["Identification", "Membership App", "Membership Agreement"]
+  },
+  {
+    "member_id": "100002",
+    "member_name": "Frank Random",
+    "application_number": 1328454,
+    "member_email": "frankrandom@example.com",
+    "employee_email": "david.godinez@cu.com",
+    "manager_email": "manager@cu.com",
+    "opened_date": "2025-07-30T15:20:00",
+    "required_docs": ["Identification", "Membership App", "Membership Agreement"]
+  },
+  {
+    "member_id": "100003",
+    "member_name": "Sarah Example",
+    "application_number": 198245,
+    "member_email": "sarahexample@example.com",
+    "employee_email": "david.godinez@cu.com",
+    "manager_email": "manager@cu.com",
+    "opened_date": "2025-08-01T09:00:00",
+    "required_docs": ["Identification", "Membership App", "Membership Agreement"]
+  }
+]

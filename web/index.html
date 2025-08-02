@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" x-data="complianceDashboard()" x-init="init()">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compliance Tracker – Document Uploads</title>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f9f9f9;
+      color: #222;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .section {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .member {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 1rem;
+    }
+    .member:last-child {
+      border-bottom: none;
+    }
+    .preview-box {
+      border: 1px solid #ccc;
+      background: #f1f1f1;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    button {
+      background: none;
+      border: 1px solid #ccc;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Compliance Tracker – Document Uploads</h1>
+  <p class="note">In a world with no constraints, this tool would auto-check Synergy every [x] amount of minutes for missing documentation on newly opened member accounts.</p>
+
+  <div class="section">
+    <h2>In Compliance (Showcasing Accounts opened in the last 3 Days Interval Only)</h2>
+    <template x-if="inCompliance.length === 0">
+      <p>No compliant members in the last 3 days.</p>
+    </template> 
+    <template x-for="member in inCompliance" :key="member.member_id">
+      <div class="member">
+        <strong x-text="`${member.member_name} (#${member.member_id})`"></strong><br>
+        Opened by: <span x-text="member.employee_email"></span><br>
+        Opened on: <span x-text="formatDate(member.opened_date)"></span>
+      </div>
+    </template>
+  </div>
+
+  <div class="section">
+    <h2>Missing Documents (Showcasing all)</h2>
+    <template x-if="missingDocs.length === 0">
+      <p>All documents are complete.</p>
+    </template>
+    <template x-for="member in missingDocs" :key="member.member_id">
+      <div class="member">
+        <strong x-text="`${member.member_name} (#${member.member_id})`"></strong><br>
+        Missing: <span x-text="getMissing(member)"></span><br>
+        Opened by: <span x-text="member.employee_email"></span><br>
+        Reminders scheduled:
+        <ul>
+          <li x-text="formatReminderTime(member.opened_date, 9)"></li>
+          <li x-text="formatReminderTime(member.opened_date, 14.5)"></li>
+        </ul>
+        <button @click="toggleEmail(member)">📧 View Scheduled Email</button>
+        <div x-show="selectedEmail === member.member_id" class="preview-box">
+          Subject: Reminder to upload documents<br>
+          To: <span x-text="member.employee_email"></span><br>
+          Body:<br>
+          Hello, please upload the following documents for <span x-text="member.member_name"></span>: <span x-text="getMissing(member)"></span>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <script>
+    function complianceDashboard() {
+      return {
+        inCompliance: [],
+        missingDocs: [],
+        selectedEmail: null,
+
+        async init() {
+          const [membersRes, uploadsRes] = await Promise.all([
+            fetch('mock_data/member_apps.json'),
+            fetch('mock_data/upload_logs.json')
+          ]);
+          const members = await membersRes.json();
+          const uploads = await uploadsRes.json();
+
+          const uploadMap = {};
+          uploads.forEach(log => {
+            uploadMap[log.member_id] = log.uploaded_docs;
+          });
+
+          const now = new Date();
+          members.forEach(member => {
+            const uploaded = uploadMap[member.member_id] || [];
+            const missing = member.required_docs.filter(doc => !uploaded.includes(doc));
+            const openedDate = new Date(member.opened_date);
+            const daysOld = (now - openedDate) / (1000 * 60 * 60 * 24);
+
+            if (missing.length === 0 && daysOld <= 3) {
+              this.inCompliance.push(member);
+            } else if (missing.length > 0) {
+              this.missingDocs.push(member);
+            }
+          });
+        },
+
+        formatDate(dt) {
+          return new Date(dt).toLocaleString();
+        },
+
+        formatReminderTime(opened, offsetHours) {
+          const base = new Date(opened);
+          base.setHours(0, 0, 0, 0);
+          base.setTime(base.getTime() + offsetHours * 60 * 60 * 1000);
+          return base.toLocaleString();
+        },
+
+        getMissing(member) {
+          const uploaded = member.uploaded_docs || [];
+          return member.required_docs.filter(d => !uploaded.includes(d)).join(', ');
+        },
+
+        toggleEmail(member) {
+          this.selectedEmail = this.selectedEmail === member.member_id ? null : member.member_id;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
