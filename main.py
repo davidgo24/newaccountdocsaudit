@@ -59,13 +59,13 @@ for member in member_apps:
         send_email_alert(member, missing_docs, escalation=False)
 
 #print report - always useful for daily ops
-print("\n📋 DAILY COMPLIANCE CHECK –", NOW.strftime("%B %d, %Y"))
+print("\n DAILY COMPLIANCE CHECK –", NOW.strftime("%B %d, %Y"))
 
-print("\n✅ In Compliance:")
+print("\n In Compliance:")
 for m in compliant_members:
     print(f"- {m['member_name']} (#{m['member_id']})")
 
-print("\n❌ Still Missing Docs:")
+print("\n Still Missing Docs:")
 for m, missing in noncompliant_members:
     print(f"- {m['member_name']} (#{m['member_id']}): {', '.join(missing)}")
 
